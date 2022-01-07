@@ -37,6 +37,11 @@ After processing the dataset, from each original image, we get 64 images each de
 
 We sill just use some vanilla classifier based on Kornia modules.
 
+The model will be a vanilla classifier with the following properties:
+
+Input shape: 50x50x1 representing a single square on the chessboard in greyscale.
+
+Output: 13x1 one-hot encoded label for [white_king, white_queen, ..., black_king, ..., empty]
 
 
 
