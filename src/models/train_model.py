@@ -19,7 +19,7 @@ def train():
                               shuffle=False)
 
     model = ChessPiecePredictor()
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.003)
 
     losses = []
@@ -40,6 +40,7 @@ def train():
         print("loss:", running_loss)
         losses.append(running_loss)
 
+    # plotting
     plt.plot(list(range(epochs)), losses)
     plt.xlabel("epoch")
     plt.ylabel("loss")
