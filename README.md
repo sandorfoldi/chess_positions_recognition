@@ -57,6 +57,40 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
-Comment by Sandor
-Comment by Rasmus
-Comment by Martyna
+
+\section*{Project Description}
+The aim of this project is to determine chess positions form schematic chess boards, using computer vision. Specifically using the Kornia framework for transforming the data and some type of convolutional neural network. The focus of the project is on the machine learning operations associated with the development.
+
+# Dataset
+
+100000 images of a randomly generated chess positions of 5-15 pieces (2 kings and 3-13 pawns/pieces)
+Images were generated using 28 styles of chess boards and 32 styles of chess pieces totaling 896 board/piece style combinations.
+
+Images were generated using this custom-build tool
+
+All images are 400 by 400 pixels.
+
+    Training set: 80000 images
+    Test set: 20000 images
+
+Pieces were generated with the following probability distribution:
+
+    30% for Pawn
+    20% for Bishop
+    20% for Knight
+    20% for Rook
+    10% for Queen
+
+2 Kings are guaranteed to be on the board.
+
+Labels are in a filename in Forsyth–Edwards Notation format, but with dashes instead of slashes.
+
+# Data processing
+
+After processing the dataset, from each original image, we get 64 images each depicting a single square on the chessboard. The images are further converted to greyscale to reduce model complexity.
+
+# Model
+
+We sill just use some vanilla classifier based on Kornia modules.
+
+
