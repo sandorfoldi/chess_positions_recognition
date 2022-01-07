@@ -3,6 +3,8 @@ chess_positions_recognition
 
 A short description of the project.
 
+For Chess Position Recognition we have to use FEN notation 
+
 Project Organization
 ------------
 
