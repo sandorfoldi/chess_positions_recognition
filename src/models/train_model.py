@@ -10,13 +10,12 @@ from torch.utils.data import DataLoader
 
 def train():
     print("Training started...")
-    parser = argparse.ArgumentParser(description='Training arguments')
-    parser.add_argument('load_data_from', default="")
+    parser = argparse.ArgumentParser(description="Training arguments")
+    parser.add_argument("load_data_from", default="")
     args = parser.parse_args(sys.argv[1:])
 
     train_data = torch.load(args.load_data_from)
-    train_loader = DataLoader(train_data, batch_size=len(train_data),
-                              shuffle=False)
+    train_loader = DataLoader(train_data, batch_size=len(train_data), shuffle=False)
 
     model = ChessPiecePredictor()
     criterion = nn.NLLLoss()
@@ -45,8 +44,8 @@ def train():
     plt.xlabel("epoch")
     plt.ylabel("loss")
     plt.savefig("reports/figures/training_run.png")
-    torch.save(model.state_dict(), 'models/trained_model.pth')
+    torch.save(model.state_dict(), "models/trained_model.pth")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     train()

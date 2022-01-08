@@ -11,9 +11,9 @@ def predict():
     printing the accuracy."""
     # parsing
     print("Evaluating until hitting the ceiling")
-    parser = argparse.ArgumentParser(description='Evaluation arguments')
-    parser.add_argument('load_model_from', default="")
-    parser.add_argument('load_data_from', default="")
+    parser = argparse.ArgumentParser(description="Evaluation arguments")
+    parser.add_argument("load_model_from", default="")
+    parser.add_argument("load_data_from", default="")
     args = parser.parse_args(sys.argv[1:])
 
     # model loading
@@ -25,8 +25,7 @@ def predict():
 
     # data loading
     test_data = torch.load(args.load_data_from)
-    test_loader = DataLoader(test_data, batch_size=len(test_data),
-                             shuffle=False)
+    test_loader = DataLoader(test_data, batch_size=len(test_data), shuffle=False)
 
     # prediction
     for images, labels in test_loader:
@@ -35,7 +34,7 @@ def predict():
         equals = top_class == labels.view(*top_class.shape)
         accuracy = torch.mean(equals.type(torch.FloatTensor))
 
-        print(f'Accuracy: {accuracy.item() * 100}%')
+        print(f"Accuracy: {accuracy.item() * 100}%")
 
 
 if __name__ == "__main__":
