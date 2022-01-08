@@ -12,17 +12,16 @@ from torch.utils.data import DataLoader
 
 def train():
     print("Training started...")
-    #parser = argparse.ArgumentParser(description='Training arguments')
-    #parser.add_argument('load_data_from', default="")
-    #args = parser.parse_args(sys.argv[1:])
+    parser = argparse.ArgumentParser(description='Training arguments')
+    parser.add_argument('load_data_from', default="")
+    args = parser.parse_args(sys.argv[1:])
 
     t = transforms.Compose([
         transforms.ToTensor(),
     ])
-    #train_data = torch.load(args.load_data_from)
-    train_data = torchvision.datasets.ImageFolder("../../data/processed/train", transform=t)
+    train_data = torchvision.datasets.ImageFolder(args.load_data_from, transform=t)
     train_loader = DataLoader(train_data, batch_size=256,
-                              shuffle=False, num_workers=4)
+                              shuffle=True, num_workers=4)
 
     model = ChessPiecePredictor()
     criterion = nn.NLLLoss()
@@ -45,7 +44,7 @@ def train():
 
             running_loss += loss.item()
             print(i)
-            i+=1
+            i += 1
 
         print("loss:", running_loss/len(train_loader))
         losses.append(running_loss)
@@ -54,8 +53,8 @@ def train():
     plt.plot(list(range(epochs)), losses)
     plt.xlabel("epoch")
     plt.ylabel("loss")
-    plt.savefig("../../reports/figures/training_run.png")
-    torch.save(model.state_dict(), '../../models/trained_model.pth')
+    plt.savefig("reports/figures/training_run.png")
+    torch.save(model.state_dict(), "models/trained_model.pth")
 
 
 if __name__ == '__main__':
