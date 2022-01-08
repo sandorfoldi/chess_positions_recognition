@@ -33,7 +33,7 @@ def transform_label(filename: str) -> List[str]:
 
 
 def make_dataset(
-    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
+    input_dir: str = "data/raw/test", output_dir: str = "data/processed/test"
 ) -> None:
 
     dirs = [
@@ -54,7 +54,7 @@ def make_dataset(
     for item in dirs:
         os.makedirs(f"{output_dir}/{item}", exist_ok=True)
 
-    files = os.listdir(input_dir)[:20000]
+    files = os.listdir(input_dir)[:5000]
 
     # for idx, file in enumerate(tqdm(files)):
     for idx, file in enumerate(tqdm(files)):
