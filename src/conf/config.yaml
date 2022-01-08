@@ -1,0 +1,5 @@
+lr: 0.001
+batch_size: 128
+image_size: 25
+num_epochs: 5
+data_path: ${hydra:runtime.cwd}/data/processed

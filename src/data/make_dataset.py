@@ -38,7 +38,7 @@ def transform_label(filename: str) -> List[str]:
 
 
 def make_dataset(
-    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
+    input_dir: str = "data/raw/test", output_dir: str = "data/processed/test"
 ) -> None:
 
     list_img = glob.glob(os.path.join(input_dir,'*.jpeg'))[:1024]
