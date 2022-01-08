@@ -51,6 +51,12 @@ def make_dataset(
         "w_R",
         "w_E",
     ]
+
+    if not os.path.exists(input_dir):
+        os.makedirs(input_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     for item in dirs:
         os.makedirs(f"{output_dir}/{item}", exist_ok=True)
 
