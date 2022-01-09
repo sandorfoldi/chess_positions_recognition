@@ -17,7 +17,15 @@ def predict():
     args = parser.parse_args(sys.argv[1:])
 
     # model loading
-    model = ChessPiecePredictor()
+    model = nn.Sequential(
+        K.contrib.VisionTransformer(
+            image_size=config.image_size,
+            patch_size=config.patch_size,
+            in_channels=1,
+            embed_dim=config.embed_dim,
+        ),
+        K.contrib.ClassificationHead(embed_size=config.embed_dim, num_classes=13),
+    )
     state_dict = torch.load(args.load_model_from)
     model.load_state_dict(state_dict)
     model.eval()
