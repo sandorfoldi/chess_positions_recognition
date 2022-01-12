@@ -1,10 +1,14 @@
 import os
 from typing import List
+import glob
 
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from numba import njit
+
+import torch
+from torchvision import transforms
 
 
 @njit
@@ -31,7 +35,7 @@ def transform_label(filename: str) -> List[str]:
                 transformed_label.append(letter)
     return transformed_label
 
-
+'''
 def make_dataset(
     input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
 ) -> None:
@@ -75,7 +79,27 @@ def make_dataset(
             else:
                 image.save(f"{output_dir}/w_{folder_names[i]}/{idx}-{i}.jpeg")
     os.rename(f"{output_dir}/w_E", f"{output_dir}/E")
+'''
 
+def make_dataset(
+    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train_1"
+) -> None:
+    list_raw_img = glob.glob(os.path.join(input_dir,'*.jpeg'))
+    img_per_slice = 100000
+    img_size_processed = (50, 50, 3)
+    slice_num = int(len(list_raw_img) * 64 / img_per_slice) # there might be some problems later with rounding integers here
+    # print(slice_num)
+    for slice_ind in range(slice_num):
+        t = torch.Tensor(img_per_slice,  img_size_processed[2], img_size_processed[0],img_size_processed[1],)
+        print(t.shape)
+        for i in range(img_per_slice):
+            print(t[i].shape)
+            print(transforms.ToTensor()(Image.open(list_raw_img[slice_ind*img_per_slice+i])).shape)
+            break
+            t[i] = transforms.ToTensor()(Image.open(list_raw_img[slice_ind*img_per_slice+i]))
+        t.save(output_dir+'imgs_train_'+str(slice_ind))
+        break
+    
 
 if __name__ == "__main__":
     make_dataset()
