@@ -9,6 +9,7 @@ RUN apt update && \
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY src/ src/
+COPY .dcv/ .dvc/
 
 # make datadir for dvc data
 RUN mkdir data/
