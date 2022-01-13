@@ -38,7 +38,7 @@ def transform_label(filename: str) -> List[str]:
 
 
 def make_dataset(
-    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train_1"
+    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
 ) -> None:
 
     list_img = glob.glob(os.path.join(input_dir,'*.jpeg'))[:1024]
@@ -57,7 +57,7 @@ def make_dataset(
         list_labels.extend(transform_label(image_path.split('/')[-1]))
     list_labels = list(map(lambda l: class_dict[l], list_labels))
     tensor_labels = torch.Tensor(list_labels)
-    torch.save(tensor_labels, 'data/processed/train_1/labels_train.pt')
+    torch.save(tensor_labels, 'data/processed/train/labels_train.pt')
 
     for slice_ind in range(num_slices):
         t = torch.Tensor(squares_per_slice, square_size[0],square_size[1], square_size[2], )
