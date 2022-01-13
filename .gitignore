@@ -43,6 +43,9 @@ nosetests.xml
 coverage.xml
 *.cover
 
+
+.dvc/cache
+
 # Translations
 *.mo
 *.pot
@@ -52,6 +55,9 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Hydra outputs
+outputs
 
 # PyBuilder
 target/

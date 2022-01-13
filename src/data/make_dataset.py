@@ -38,7 +38,7 @@ def transform_label(filename: str) -> List[str]:
 
 
 def make_dataset(
-    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
+    input_dir: str = "data/raw/test", output_dir: str = "data/processed/test"
 ) -> None:
 
     list_img = glob.glob(os.path.join(input_dir,'*.jpeg'))[:1024]
@@ -47,7 +47,7 @@ def make_dataset(
     images_per_slice = int(squares_per_slice / 64)
     
     square_size = (50, 50, 3)
-
+    
     num_images = len(list_img)
     num_squares = num_images * 64 
     num_slices = int(num_images / images_per_slice) 
