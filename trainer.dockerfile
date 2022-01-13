@@ -18,7 +18,6 @@ WORKDIR /
 
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc
-RUN dvc init --no-scm
 RUN dvc pull
 
 
