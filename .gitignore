@@ -62,6 +62,9 @@ outputs
 # PyBuilder
 target/
 
+# output files from hydra
+outputs/
+
 # DotEnv configuration
 .env
 
@@ -83,7 +86,8 @@ target/
 
 # exclude data from source control by default
 /data/
-
+# still include dvc files from the data directory
+!data/**/*.dvc
 # Mac OS-specific storage files
 .DS_Store
 
@@ -93,3 +97,4 @@ target/
 
 # Mypy cache
 .mypy_cache/
+/data
