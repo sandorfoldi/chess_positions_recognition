@@ -43,6 +43,9 @@ nosetests.xml
 coverage.xml
 *.cover
 
+
+.dvc/cache
+
 # Translations
 *.mo
 *.pot
