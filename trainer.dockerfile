@@ -21,4 +21,4 @@ RUN pip install dvc
 RUN dvc pull
 
 
-ENTRYPOINT ["python", "-u", "src/models/train_model2.py"]
+ENTRYPOINT ["python", "-u", "src/models/train_model.py"]
