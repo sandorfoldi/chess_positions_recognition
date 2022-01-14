@@ -19,6 +19,29 @@ def crop(image: np.ndarray) -> List[np.ndarray]:
     return parts
 
 
+def board_to_fen(board):
+    board_len = 8
+
+    lines = board.split("\n")
+
+    fen = ""
+    for line in lines:
+        for i in range(board_len):
+            if line[i] == "_":
+                if len(fen) == 0:
+                    fen += "1"
+                elif fen[-1] in "0123456789":
+                    fen = fen[:-1] + str(int(fen[-1]) + 1)
+                else:
+                    fen += "1"
+            else:
+                fen += line[i]
+
+        fen += "-"
+
+    return fen[:-1]  # do [:-1] to remove last "/"
+
+
 def predict():
     """Given a model and an image of an entire chess board (found in data/raw/ folder),
     this method predicts what piece (if any) is on each square"""
@@ -55,12 +78,19 @@ def predict():
     classes = ["_", "b", "k", "n", "p", "q", "r", "B", "K", "N", "P", "Q", "R"]
 
     _, prediction_indices = torch.max(prediction, dim=1)
+
+    board = ""
     i = 0
     for index in prediction_indices:
         print(classes[index], end="")
+        board += str(classes[index])
         i += 1
         if i % 8 == 0:
             print()
+            board += "\n"
+
+    # the last char is a newline, so [:-1] removes that
+    print("fen:", board_to_fen(board[:-1]))
 
 
 if __name__ == "__main__":
