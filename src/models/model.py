@@ -15,6 +15,7 @@ class ChessPiecePredictor(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # make sure input tensor is flattened
         # x = x.view(x.shape[0], -1)
+        print(x.shape)
 
         x = self.inp(x)
         x = self.out(x)
