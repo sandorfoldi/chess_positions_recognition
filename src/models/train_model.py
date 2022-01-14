@@ -52,18 +52,18 @@ def train(config) -> None:
     
     image_transforms = transforms.Compose(
         [
-            # transforms.Resize((config.image_size, config.image_size)),
-            # transforms.ToTensor(),
+            transforms.ToPILImage(),
             transforms.Grayscale(num_output_channels=1),
-            transforms.Normalize(128, 128)
+            transforms.Resize((config.image_size, config.image_size)),
+            transforms.ToTensor(),
         ]
     )
 
     # transforms are not implemented in the dataset
     train_data = ChessPositionsDataset(f'{config.data_path}/train', image_transforms, split='train')
     valid_data = ChessPositionsDataset(f'{config.data_path}/test', image_transforms, split='test')
-    indices_train = torch.arange(4096)
-    indices_valid = torch.arange(1024)
+    indices_train = torch.arange(5000)
+    indices_valid = torch.arange(1000)
     
     train_data = data_utils.Subset(train_data, indices_train)
     valid_data = data_utils.Subset(valid_data, indices_valid)
@@ -75,7 +75,7 @@ def train(config) -> None:
         valid_data, batch_size=config.batch_size, shuffle=True, num_workers=0
     )
 
-    batch_item = iter(train_loader).next()
+    # batch_item = iter(train_loader).next()
 
     model = CNN()
 
