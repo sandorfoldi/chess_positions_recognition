@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from kornia.x import ImageClassifierTrainer, ModelCheckpoint, Trainer
 import os
 import random
+from tqdm import tqdm
 
 
 @hydra.main(config_path="../conf", config_name="config")
@@ -54,8 +55,8 @@ def train(cfg):
     
     for e in range(cfg.num_epochs):
         running_loss = 0
-        for images, labels in train_loader:
-            # print(labels)
+        print(f'epoch: {e}')
+        for images, labels in tqdm(train_loader):
             images = images.to(DEVICE)
             
             optimizer.zero_grad()
