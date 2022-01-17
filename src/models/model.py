@@ -8,15 +8,13 @@ class ChessPiecePredictor(nn.Module):
     def __init__(self):
         super().__init__()
         self.inp = K.VisionTransformer(
-            image_size=50, patch_size=16, in_channels=1, embed_dim=128, num_heads=3
-        )
+            image_size=50,
+            patch_size=5,
+            in_channels=1)
         self.out = K.ClassificationHead(num_classes=13)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # make sure input tensor is flattened
-        # x = x.view(x.shape[0], -1)
-        print(x.shape)
 
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.inp(x)
         x = self.out(x)
 
@@ -28,17 +26,22 @@ class CNN(nn.Module):
         super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=0,
-            ),
+                in_channels=1,
+                out_channels=16,
+                kernel_size=3,
+                stride=1,
+                padding=0),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2),
         )
         self.conv2 = nn.Sequential(
-            nn.Conv2d(16, 32, 5, 1, 2), nn.ReLU(), nn.MaxPool2d(2),
-        )
-        self.linear = nn.Linear(
-            32 * 12 * 12, 13
-        )  # out channels x h x w (when flattening for linear)
+            nn.Conv2d(16, 32, 5, 1, 2),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            )
+        # out channels x h x w (when flattening for linear)
+        self.linear = nn.Linear(32 * 12 * 12, 13)  
+
 
     def forward(self, x):
 
