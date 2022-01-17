@@ -1,4 +1,4 @@
-'''
+
 import torch
 from torch import Tensor
 from src.models.train_model import train
@@ -36,5 +36,5 @@ def test_train(mock_ChessPiecePredictor):
     #train()
 
     mock_ChessPiecePredictor.assert_called_once()
-'''
+
     

@@ -1,6 +1,7 @@
 import torch
 from src.models.model import ChessPiecePredictor
 
+
 shape_tensor = torch.randn(50,50,3)
 print(shape_tensor.shape)
 model = ChessPiecePredictor()
