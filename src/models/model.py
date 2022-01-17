@@ -1,5 +1,6 @@
 import kornia.contrib as K
 import torch.nn as nn
+import torch
 
 
 class ChessPiecePredictor(nn.Module):
