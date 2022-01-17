@@ -1,13 +1,12 @@
 import torch
+import hydra
 from src.models.model import ChessPiecePredictor
+import omegaconf
 
-
-shape_tensor = torch.randn(50,50,3)
-print(shape_tensor.shape)
-model = ChessPiecePredictor()
-print(model(shape_tensor).shape)
 
 def test_model_output():
-    shape_tensor = torch.randn(2500)
+    cfg = omegaconf.OmegaConf.load('src\conf\config.yaml')
+    print(cfg)
+    shape_tensor = torch.randn(cfg.batch_size, 1, cfg.image_size, cfg.image_size)
     model = ChessPiecePredictor()
-    assert list(model(shape_tensor).shape) == [64, 10] , "Model didn't output the right shape"
+    assert list(model(shape_tensor).shape) == [cfg.batch_size, 13] , "Model didn't output the right shape"
