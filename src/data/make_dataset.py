@@ -1,13 +1,14 @@
 import os
-from typing import List
+import argparse
 import glob
-
 import numpy as np
+import torch
+
+from typing import List
 from PIL import Image
 from tqdm import tqdm
 from numba import njit
 from tqdm import tqdm
-import torch
 from torchvision import transforms
 
 class_dict = {'e': 0, 'E': 0, 'r': 1, 'n': 2, 'b': 3, 'q': 4, 'k': 5, 'p': 6, 'R': 7, 'N': 8, 'B': 9, 'Q': 10, 'K': 11, 'P': 12}
@@ -37,38 +38,66 @@ def transform_label(filename: str) -> List[str]:
     return transformed_label
 
 
+
 def make_dataset(
-    input_dir: str = "data/raw/train", output_dir: str = "data/processed/train"
+    input_dir: str = "data/raw/train",
+    output_dir: str = "data/processed/train",
+    ind_start: int = 0,
+    ind_stop: int = 5000,
 ) -> None:
 
-    list_img = glob.glob(os.path.join(input_dir,'*.jpeg'))[:1024]
+    dirs = [
+        "b_b",
+        "b_k",
+        "b_n",
+        "b_p",
+        "b_q",
+        "b_r",
+        "w_B",
+        "w_K",
+        "w_N",
+        "w_P",
+        "w_Q",
+        "w_R",
+        "w_E",
+    ]
 
-    squares_per_slice = 2**14
-    images_per_slice = int(squares_per_slice / 64)
-    
-    square_size = (50, 50, 3)
+    if not os.path.exists(input_dir):
+        os.makedirs(input_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    num_images = len(list_img)
-    num_squares = num_images * 64 
-    num_slices = int(num_images / images_per_slice) 
+    for item in dirs:
+        os.makedirs(f"{output_dir}/{item}", exist_ok=True)
 
-    list_labels = []
-    for image_path in list_img:
-        list_labels.extend(transform_label(image_path.split('/')[-1]))
-    list_labels = list(map(lambda l: class_dict[l], list_labels))
-    tensor_labels = torch.Tensor(list_labels)
-    torch.save(tensor_labels, 'data/processed/train/labels_train.pt')
+    files = os.listdir(input_dir)[ind_start:ind_stop]
 
-    for slice_ind in range(num_slices):
-        t = torch.Tensor(squares_per_slice, square_size[0],square_size[1], square_size[2], )
-        for image_ind in range(images_per_slice):
-            img = np.array(Image.open(list_img[image_ind]))
-            squares = crop(img)
-            squares = np.stack(squares, axis=0)
-            t[image_ind*64:(image_ind+1)*64] = torch.from_numpy(squares)
+    # for idx, file in enumerate(tqdm(files)):
+    for idx, file in enumerate(tqdm(files)):
+        folder_names = transform_label(file)
+        orig_image = Image.open(f"{input_dir}/{file}")
+        orig_image = np.array(orig_image)
+        cropped_images = crop(orig_image)
+        for i in range(len(folder_names)):
+            image = Image.fromarray(cropped_images[i])
+            if not folder_names[i].isupper():
+                image.save(f"{output_dir}/b_{folder_names[i]}/{idx}-{i}.jpeg")
+            else:
+                image.save(f"{output_dir}/w_{folder_names[i]}/{idx}-{i}.jpeg")
+    os.rename(f"{output_dir}/w_E", f"{output_dir}/E")
 
-        torch.save(t, output_dir+'/imgs_train_'+str(slice_ind)+'.pt')
-        
-    
+
 if __name__ == "__main__":
-    make_dataset()
+    make_dataset(
+        input_dir = "data/raw/train",
+        output_dir = "data/processed/train",
+        ind_start = 0,
+        ind_stop = 1000
+        )
+
+    make_dataset(
+        input_dir = "data/raw/test",
+        output_dir = "data/processed/test",
+        ind_start = 0,
+        ind_stop = 500,
+        )
