@@ -1,102 +1,71 @@
-import argparse
-import math
-import sys
-from pathlib import Path
-from time import time
-
+import hydra
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
-import torchvision
-from model import ChessPiecePredictor
-from torch import nn
-from torch.utils.data import DataLoader
+from model import CNN, ChessPiecePredictor
+from torch import nn, optim
+from torchvision.datasets import ImageFolder
 from torchvision import transforms
+import torch.utils.data as data_utils
+from torch.utils.data import DataLoader
+from kornia.x import ImageClassifierTrainer, ModelCheckpoint, Trainer
+import os
+import random
+from tqdm import tqdm
 
 
-def train():
-    parser = argparse.ArgumentParser(description="Training arguments")
-    parser.add_argument("load_data_from", default="")
-    # used for loading and training a model
-    parser.add_argument("--continue_training_from", required=False, type=Path)
-    args = parser.parse_args(sys.argv[1:])
+@hydra.main(config_path="../conf", config_name="config")
+def train(cfg):
 
-    start_time = time()
+    print(f"Training started with parameters: {cfg}")
+    
+    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    
+    torch.manual_seed(cfg.seed)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device:", device)
+    model = CNN()
 
-    print("Loading data...")
     t = transforms.Compose(
         [
+            transforms.Resize((cfg.image_size, cfg.image_size)),
+            transforms.Grayscale(num_output_channels=1),
             transforms.ToTensor(),
-            transforms.Grayscale(),
         ]
     )
 
-    data_set = torchvision.datasets.ImageFolder(args.load_data_from, transform=t)
-    train_size = math.ceil(len(data_set) * 0.85)
-    validation_size = math.floor(len(data_set) * 0.15)
+    train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
+    valid_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
-    train_data, validation_data = torch.utils.data.random_split(
-        data_set, [train_size, validation_size]
-    )
+    indices_train = random.sample(range(1, 60000), 5000)
+    indices_valid = random.sample(range(1, 30000), 1000)
 
-    batch_size = 4
+    train_data = data_utils.Subset(train_data, indices_train)
+    valid_data = data_utils.Subset(valid_data, indices_valid)
     train_loader = DataLoader(
-        train_data, batch_size=batch_size, pin_memory=True, num_workers=4, shuffle=True
+        train_data, batch_size=cfg.batch_size, shuffle=True
     )
-    validation_loader = DataLoader(
-        validation_data,
-        batch_size=batch_size,
-        pin_memory=True,
-        num_workers=4,
-        shuffle=False,
+    valid_loader = DataLoader(
+        valid_data, batch_size=cfg.batch_size, shuffle=True
     )
 
-    model = ChessPiecePredictor()
-
-    if args.continue_training_from:
-        print(f"Loading model from {args.continue_training_from} ...")
-        checkpoint = torch.load(args.continue_training_from)
-        model.load_state_dict(checkpoint)
-
-    model.to(device)
     criterion = nn.CrossEntropyLoss()
-
-    learning_rate = 1e-4
-    momentum = 0.9
-    weight_decay = 0.0000001
-    optimizer = torch.optim.SGD(
-        model.parameters(),
-        lr=learning_rate,
-        momentum=momentum,
-        weight_decay=weight_decay,
-    )
-
-    print("Training started...")
-    train_losses = []
-    validation_losses = []
-
-    batch_count = int(train_size / batch_size)
-    epochs = 2
-    for e in range(epochs):
-        train_loss = 0
-        train_correct = 0
-
-        validation_loss = 0
-        validation_correct = 0
-
-        i = 0
-        for images, labels in train_loader:
-            # in case we use cuda to train on gpu
-            images = images.to(device)
-            labels = labels.to(device)
-
+    optimizer = optim.Adam(model.parameters(), lr=cfg.lr)
+    step = 0
+    train_losses, test_losses, accuracies = [], [], []
+    
+    for e in range(cfg.num_epochs):
+        running_loss = 0
+        print(f'epoch: {e}')
+        for images, labels in tqdm(train_loader):
+            images = images.to(DEVICE)
+            
             optimizer.zero_grad()
 
-            preds = model(images)
-            loss = criterion(preds, labels)
+            out = model(images)
+
+            loss = criterion(out, labels)
             loss.backward()
+
             optimizer.step()
             train_loss += loss.item()
 
@@ -121,41 +90,67 @@ def train():
 
             validation_loss += loss.item()
 
-            # accuracy
-            _, preds_indices = torch.max(preds, dim=1)
-            validation_correct += (preds_indices == labels).sum()
+            running_loss += loss.item()
+            step += 1
 
-        train_accuracy = float(train_correct / (len(train_loader) * batch_size))
-        validation_accuracy = float(validation_correct / (len(validation_loader) * batch_size))
-        print("Epoch:", e + 1)
-        print("Train loss:         ", train_loss / len(train_loader))
-        print("Validation loss:    ", validation_loss / len(validation_loader))
-        print("Train Accuracy:     ", train_accuracy)
-        print("Validation accuracy:", validation_accuracy)
-        print("Time:               ", time() - start_time)
+        else:
+            with torch.no_grad():
+                running_accuracy = 0
+                running_val_loss = 0
+                for images, labels in valid_loader:
+                    out = model(images)
+                    loss = criterion(out, labels)
+                    running_val_loss += loss.item()
+                    top_p, top_class = out.topk(1, dim=1)
+                    equals = top_class == labels.view(*top_class.shape)
+                    accuracy = torch.mean(equals.type(torch.FloatTensor))
+                    running_accuracy += accuracy.item()
+            epoch_loss = running_loss / len(train_loader)
+            epoch_val_loss = running_val_loss / len(valid_loader)
+            epoch_val_acc = running_accuracy / len(valid_loader)
 
-        start_time = time()
-        train_losses.append(train_loss / len(train_loader))
-        validation_losses.append(validation_loss / len(validation_loader))
+            train_losses.append(epoch_loss)
+            test_losses.append(epoch_val_loss)
+            accuracies.append(epoch_val_acc)
 
-    # plotting
-    plt.plot(list(range(1, len(train_losses) + 1)), train_losses, label="Training loss")
-    print("Train losses:", train_losses)
-
-    plt.plot(list(range(1, len(validation_losses) + 1)), validation_losses, label="Validation loss")
-    print("Validation losses:", validation_losses)
-
-    plt.xlabel("epoch")
-    plt.ylabel("loss")
+            print(f"Testset accuracy: {epoch_val_acc*100}%")
+            print(f"Validation loss: {epoch_val_loss}")
+            print(f"Training loss: {epoch_loss}")
+    print("Training finished!")
+    
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    #     optimizer, cfg.num_epochs * len(train_loader)
+    # )
+    
+    # model_checkpoint = ModelCheckpoint(filepath="./outputs", monitor="top5",)
+    
+    
+    # trainer = ImageClassifierTrainer(
+    #     model,
+    #     train_dataloader = train_loader,
+    #     valid_dataloader = valid_loader,
+    #     criterion,
+    #     optimizer,
+    #     scheduler,
+    #     cfg,
+    #     callbacks={"on_checkpoint": model_checkpoint,},
+    # )
+    
+    # trainer.fit()
+    
+    os.makedirs("models/", exist_ok=True)
+    torch.save(model.state_dict(), "models/trained_model.pt")
+    print("Model saved")
+    
+    plt.plot(np.arange(cfg.num_epochs), train_losses, label="training loss")
+    plt.plot(np.arange(cfg.num_epochs), test_losses, label="validation loss")
+    plt.plot(np.arange(cfg.num_epochs), accuracies, label="accuracy")
+    plt.xlabel("epochs")
     plt.legend()
+    plt.title("model training")
 
-    fig_path = Path("reports/figures/training_run.png")
-    plt.savefig(fig_path)
-    print(f"Saved training loss figure to {fig_path}")
-
-    model_path = Path("models/trained_model.pth")
-    torch.save(model.state_dict(), model_path)
-    print(f"Saved trained model to {model_path}")
+    os.makedirs("figures/", exist_ok=True)
+    plt.savefig("figures/train_loss.png")
 
 
 if __name__ == "__main__":

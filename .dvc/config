@@ -1,0 +1,5 @@
+[core]
+    remote = remote_storage
+    no_scm = true
+['remote "remote_storage"']
+    url = gs://bucket-chess_positions_recognition/
