@@ -67,32 +67,7 @@ def train(cfg):
             loss.backward()
 
             optimizer.step()
-            train_loss += loss.item()
-
-            # accuracy
-            _, preds_indices = torch.max(preds, dim=1)
-            train_correct += (preds_indices == labels).sum()
-
-            i += 1
-            if i % 100 == 0:
-                print(
-                    f"Epoch: {e+1} / {epochs}"
-                    f" - progress: {i} / {batch_count}"
-                    f" - loss: {loss.data.mean()}"
-                )
-
-        for images, labels in validation_loader:
-            images = images.to(device)
-            labels = labels.to(device)
-
-            preds = model(images)
-            loss = criterion(preds, labels)
-
-            validation_loss += loss.item()
-
             running_loss += loss.item()
-            step += 1
-
         else:
             with torch.no_grad():
                 running_accuracy = 0
