@@ -2,7 +2,6 @@ from tests import _PATH_DATA
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from torch.utils.data import DataLoader
-import numpy as np
 import torch
 
 
@@ -12,7 +11,6 @@ train_data = ImageFolder(
 train_loader = DataLoader(train_data, batch_size=2048, shuffle=True, num_workers=0)
 
 images, labels = next(iter(train_loader))
-
 
 
 def test_cropped_images():
@@ -28,4 +26,4 @@ def test_dataset_length():
 
 
 def test_class_dict():
-    assert torch.all(torch.eq(labels.unique(),torch.arange(13)))
+    assert torch.all(torch.eq(labels.unique(), torch.arange(13)))
