@@ -4,9 +4,7 @@ import omegaconf
 
 
 def test_model_output():
-    cfg = omegaconf.OmegaConf.load(
-        "/home/runner/work/chess_positions_recognition/src/conf/config.yaml"
-    )
+    cfg = omegaconf.OmegaConf.load("src/conf/config.yaml")
     shape_tensor = torch.randn(cfg.batch_size, 1, cfg.image_size, cfg.image_size)
     model = model = ChessPiecePredictor(
         image_size=cfg.image_size,

@@ -1,4 +1,4 @@
-# from tests import _PATH_DATA
+from tests import _PATH_DATA
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -6,7 +6,7 @@ import torch
 
 
 train_data = ImageFolder(
-    "/home/runner/work/chess_positions_recognition/data/processed/train",
+    f"{_PATH_DATA}/processed/train",
     transform=transforms.ToTensor(),
 )
 train_loader = DataLoader(train_data, batch_size=2048, shuffle=True, num_workers=0)

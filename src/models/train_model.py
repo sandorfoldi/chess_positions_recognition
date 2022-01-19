@@ -15,8 +15,6 @@ def train(cfg):
 
     print(f"Training started with parameters: {cfg}")
 
-    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
     torch.manual_seed(cfg.seed)
 
     model = ChessPiecePredictor(
