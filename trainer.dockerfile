@@ -11,10 +11,10 @@ WORKDIR /root
 RUN mkdir data/
 
 COPY requirements.txt root/requirements.txt
-COPY setup.py root/setup.py
-COPY src/ root/src/
-COPY .dvc/ root/.dvc/
-COPY data.dvc root/data.dvc
+COPY setup.py setup.py
+COPY src/ src/
+COPY .dvc/ .dvc/
+COPY data.dvc data.dvc
 
 RUN dir
 
