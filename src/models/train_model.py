@@ -43,6 +43,12 @@ def train():
         data_set, [train_size, validation_size]
     )
 
+    indices_train = random.sample(range(1, 60000), 5000)
+    indices_valid = random.sample(range(1, 30000), 1000)
+
+    train_data = data_utils.Subset(train_data, indices_train)
+    validation_data = data_utils.Subset(validation_data, indices_valid)
+
     batch_size = 4
     train_loader = DataLoader(
         train_data, batch_size=batch_size, pin_memory=True, num_workers=4, shuffle=True
