@@ -6,14 +6,14 @@ RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /root
 
-RUN mkdir app/data/
+RUN mkdir data/
 
-COPY requirements.txt app/requirements.txt
-COPY setup.py app/setup.py
-COPY src/ app/src/
-COPY .dvc/ app/.dvc/
+COPY requirements.txt root/requirements.txt
+COPY setup.py root/setup.py
+COPY src/ root/src/
+COPY .dvc/ root/.dvc/
 
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc
