@@ -12,7 +12,6 @@ COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY src/ src/
 COPY .dvc/ .dvc/
-COPY data.dvc data.dvc
 
 RUN dir
 
