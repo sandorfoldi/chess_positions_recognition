@@ -3,6 +3,7 @@ import math
 import sys
 from pathlib import Path
 from time import time
+import random
 
 import matplotlib.pyplot as plt
 import torch
@@ -10,13 +11,14 @@ import torchvision
 from model import ChessPiecePredictor
 from torch import nn
 from torch.utils.data import DataLoader
+import torch.utils.data as data_utils
 from torchvision import transforms
 import wandb
 
 
 def train():
     parser = argparse.ArgumentParser(description="Training arguments")
-    parser.add_argument("load_data_from", default="")
+    #parser.add_argument("load_data_from", default="")
     # used for loading and training a model
     parser.add_argument("--continue_training_from", required=False, type=Path)
     args = parser.parse_args(sys.argv[1:])
@@ -34,7 +36,7 @@ def train():
             transforms.Grayscale(),
         ]
     )
-
+    '''
     data_set = torchvision.datasets.ImageFolder(args.load_data_from, transform=t)
     train_size = math.ceil(len(data_set) * 0.85)
     validation_size = math.floor(len(data_set) * 0.15)
@@ -42,6 +44,10 @@ def train():
     train_data, validation_data = torch.utils.data.random_split(
         data_set, [train_size, validation_size]
     )
+    '''
+
+    train_data = ImageFolder("data/processed/train", transform=t)
+    validation_data = ImageFolder("data/processed/test", transform=t)
 
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
