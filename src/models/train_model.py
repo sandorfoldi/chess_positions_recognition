@@ -95,7 +95,7 @@ def train():
     train_losses = []
     validation_losses = []
 
-    batch_count = int(train_size / batch_size)
+    batch_count = len(train_loader)#int(train_size / batch_size)
     epochs = 2
     for e in range(epochs):
         train_loss = 0
