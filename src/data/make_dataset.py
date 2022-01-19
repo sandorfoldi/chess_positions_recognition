@@ -1,17 +1,28 @@
 import os
-import argparse
-import glob
 import numpy as np
-import torch
 
 from typing import List
 from PIL import Image
 from tqdm import tqdm
 from numba import njit
-from tqdm import tqdm
-from torchvision import transforms
 
-class_dict = {'e': 0, 'E': 0, 'r': 1, 'n': 2, 'b': 3, 'q': 4, 'k': 5, 'p': 6, 'R': 7, 'N': 8, 'B': 9, 'Q': 10, 'K': 11, 'P': 12}
+class_dict = {
+    "e": 0,
+    "E": 0,
+    "r": 1,
+    "n": 2,
+    "b": 3,
+    "q": 4,
+    "k": 5,
+    "p": 6,
+    "R": 7,
+    "N": 8,
+    "B": 9,
+    "Q": 10,
+    "K": 11,
+    "P": 12,
+}
+
 
 @njit
 def crop(image: np.ndarray) -> List[np.ndarray]:
@@ -36,7 +47,6 @@ def transform_label(filename: str) -> List[str]:
             else:
                 transformed_label.append(letter)
     return transformed_label
-
 
 
 def make_dataset(
@@ -72,7 +82,6 @@ def make_dataset(
 
     files = os.listdir(input_dir)[ind_start:ind_stop]
 
-    # for idx, file in enumerate(tqdm(files)):
     for idx, file in enumerate(tqdm(files)):
         folder_names = transform_label(file)
         orig_image = Image.open(f"{input_dir}/{file}")
@@ -89,15 +98,15 @@ def make_dataset(
 
 if __name__ == "__main__":
     make_dataset(
-        input_dir = "data/raw/train",
-        output_dir = "data/processed/train",
-        ind_start = 0,
-        ind_stop = 1000
-        )
+        input_dir="data/raw/train",
+        output_dir="data/processed/train",
+        ind_start=0,
+        ind_stop=1000,
+    )
 
     make_dataset(
-        input_dir = "data/raw/test",
-        output_dir = "data/processed/test",
-        ind_start = 0,
-        ind_stop = 500,
-        )
+        input_dir="data/raw/test",
+        output_dir="data/processed/test",
+        ind_start=0,
+        ind_stop=500,
+    )
