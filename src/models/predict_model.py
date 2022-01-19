@@ -4,7 +4,6 @@ from typing import List
 
 import numpy as np
 import torch
-from model import ChessPiecePredictor
 from PIL import Image
 from torchvision import transforms
 
