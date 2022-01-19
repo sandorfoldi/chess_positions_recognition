@@ -15,7 +15,7 @@ def crop(image: np.ndarray) -> List[np.ndarray]:
     parts = []
     for r in range(0, image.shape[0], 50):
         for c in range(0, image.shape[1], 50):
-            parts.append(image[r: r + 50, c: c + 50])
+            parts.append(image[r : r + 50, c : c + 50])
     return parts
 
 
