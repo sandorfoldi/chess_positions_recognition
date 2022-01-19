@@ -1,15 +1,10 @@
 import os
-import argparse
-import glob
 import numpy as np
-import torch
 
 from typing import List
 from PIL import Image
 from tqdm import tqdm
 from numba import njit
-from tqdm import tqdm
-from torchvision import transforms
 
 class_dict = {
     "e": 0,
@@ -87,7 +82,6 @@ def make_dataset(
 
     files = os.listdir(input_dir)[ind_start:ind_stop]
 
-    # for idx, file in enumerate(tqdm(files)):
     for idx, file in enumerate(tqdm(files)):
         folder_names = transform_label(file)
         orig_image = Image.open(f"{input_dir}/{file}")

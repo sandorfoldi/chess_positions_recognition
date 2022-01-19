@@ -1,18 +1,13 @@
 import hydra
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
-from model import CNN, ChessPiecePredictor
+from model import ChessPiecePredictor
 from torch import nn, optim
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
-from kornia.x import ImageClassifierTrainer, ModelCheckpoint, Trainer
-import os
+from kornia.x import ImageClassifierTrainer, ModelCheckpoint
 import random
-from tqdm import tqdm
-import kornia.contrib as K
 
 
 @hydra.main(config_path="../conf", config_name="config")
@@ -75,20 +70,6 @@ def train(cfg):
     )
 
     trainer.fit()
-
-    # os.makedirs("models/", exist_ok=True)
-    # torch.save(model.state_dict(), "models/trained_model.pt")
-    # print("Model saved")
-
-    # plt.plot(np.arange(cfg.num_epochs), train_losses, label="training loss")
-    # plt.plot(np.arange(cfg.num_epochs), test_losses, label="validation loss")
-    # plt.plot(np.arange(cfg.num_epochs), accuracies, label="accuracy")
-    # plt.xlabel("epochs")
-    # plt.legend()
-    # plt.title("model training")
-
-    # os.makedirs("figures/", exist_ok=True)
-    # plt.savefig("figures/train_loss.png")
 
 
 if __name__ == "__main__":
