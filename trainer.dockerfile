@@ -15,7 +15,7 @@ COPY setup.py root/setup.py
 COPY src/ root/src/
 COPY .dvc/ root/.dvc/
 
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r root/requirements.txt --no-cache-dir
 RUN pip install dvc
 RUN dvc pull
 
