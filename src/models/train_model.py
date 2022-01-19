@@ -8,7 +8,7 @@ import random
 import matplotlib.pyplot as plt
 import torch
 import torchvision
-from model import ChessPiecePredictor
+from model import ChessPiecePredictor, CNN
 from torch import nn
 from torch.utils.data import DataLoader
 import torch.utils.data as data_utils
@@ -68,7 +68,8 @@ def train():
         shuffle=False,
     )
 
-    model = ChessPiecePredictor()
+    #model = ChessPiecePredictor()
+    model = CNN()
     # TODO what does this do?
     wandb.watch(model)
 
