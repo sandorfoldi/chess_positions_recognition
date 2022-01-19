@@ -13,6 +13,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 import torch.utils.data as data_utils
 from torchvision import transforms
+from torchvision.datasets import ImageFolder
 import wandb
 
 
