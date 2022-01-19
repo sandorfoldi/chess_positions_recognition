@@ -17,6 +17,7 @@ COPY .dvc/ root/.dvc/
 
 RUN pip install -r root/requirements.txt --no-cache-dir
 RUN pip install dvc
+RUN cd root
 RUN dvc pull
 
 
