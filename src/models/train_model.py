@@ -147,21 +147,11 @@ def train():
         validation_accuracy = float(validation_correct / (len(validation_loader) * batch_size))
 
         wandb.log({
-            "epoch": e + 1,
             "train_loss": train_loss,
             "validation_loss": validation_loss,
             "train_accuracy": train_accuracy,
             "validation_accuracy": validation_accuracy,
-            "time": time,
         })
-        '''
-        print("Epoch:", e + 1)
-        print("Train loss:         ", train_loss / len(train_loader))
-        print("Validation loss:    ", validation_loss / len(validation_loader))
-        print("Train Accuracy:     ", train_accuracy)
-        print("Validation accuracy:", validation_accuracy)
-        print("Time:               ", time() - start_time)
-        '''
 
         start_time = time()
         train_losses.append(train_loss / len(train_loader))
@@ -170,8 +160,6 @@ def train():
     # plotting
     plt.plot(list(range(1, len(train_losses) + 1)), train_losses, label="Training loss")
     print("Train losses:", train_losses)
-
-    #wandb.log({"train_losses": train_losses})
 
     plt.plot(list(range(1, len(validation_losses) + 1)), validation_losses, label="Validation loss")
     print("Validation losses:", validation_losses)

@@ -1,6 +1,7 @@
 import kornia.contrib as K
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class ChessPiecePredictor(nn.Module):
@@ -14,6 +15,7 @@ class ChessPiecePredictor(nn.Module):
         x = self.out(x)
 
         return x
+
 
 class CNN(nn.Module):
     def __init__(self):
