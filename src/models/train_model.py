@@ -43,7 +43,6 @@ def train(cfg):
     train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
     validation_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
-
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
 
