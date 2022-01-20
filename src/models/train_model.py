@@ -4,10 +4,8 @@ from model import ChessPiecePredictor
 from torch import nn, optim
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
-import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 from kornia.x import ImageClassifierTrainer, ModelCheckpoint
-import random
 
 
 @hydra.main(config_path="../conf", config_name="config")
@@ -36,11 +34,6 @@ def train(cfg):
     train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
     valid_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
-    # indices_train = random.sample(range(1, 60000), 5000)
-    # indices_valid = random.sample(range(1, 30000), 1000)
-
-    # train_data = data_utils.Subset(train_data, indices_train)
-    # valid_data = data_utils.Subset(valid_data, indices_valid)
     train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
     valid_loader = DataLoader(valid_data, batch_size=cfg.batch_size, shuffle=True)
 

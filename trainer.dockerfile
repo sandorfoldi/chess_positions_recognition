@@ -9,16 +9,12 @@ RUN apt update && \
 WORKDIR /root
 
 COPY requirements.txt requirements.txt
-COPY .dvc .dvc
-COPY setup.py setup.py
 COPY src/ src/
-COPY data2.dvc data2.dvc
-
-RUN dir
 
 RUN pip install -r requirements.txt --no-cache-dir
-RUN pip install dvc[gs]
-RUN mkdir data2
-RUN dvc pull data2
+RUN pip install gsutil
+
+RUN mkdir data
+RUN gsutil -m cp -r gs://chess_predictor_data/processed data/
 
 ENTRYPOINT ["python", "src/models/train_model.py"]
