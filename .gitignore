@@ -86,7 +86,7 @@ outputs/
 
 # exclude data from source control by default
 /data/
-/data2/
+/data23/
 # still include dvc files from the data directory
 # !data/**/*.dvc
 # Mac OS-specific storage files

@@ -6,6 +6,7 @@ from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from kornia.x import ImageClassifierTrainer, ModelCheckpoint
+from google.cloud import storage
 
 
 @hydra.main(config_path="../conf", config_name="config")
@@ -59,8 +60,15 @@ def train(cfg):
         cfg,
         callbacks={"on_checkpoint": model_checkpoint},
     )
+    
 
     trainer.fit()
+    
+    storage_client = storage.Client()
+    bucket = storage_client.bucket('chess_predictor')
+    blob = bucket.blob('model_blob')
+
+    blob.upload_from_filename('outputs/model_0.pt')
 
 
 if __name__ == "__main__":
