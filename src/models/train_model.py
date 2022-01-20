@@ -1,20 +1,26 @@
 
+import random
+import os
+
+import matplotlib.pyplot as plt
+import wandb
 import hydra
 import torch
+import torch.utils.data as data_utils
 from model import ChessPiecePredictor
 from torch import nn, optim
-from torchvision.datasets import ImageFolder
-from torchvision import transforms
-import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
-from kornia.x import ImageClassifierTrainer, ModelCheckpoint
-import random
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 @hydra.main(config_path="../conf", config_name="config")
 def train(cfg):
-
     print(f"Training started with parameters: {cfg}")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    wandb.init()
 
     torch.manual_seed(cfg.seed)
 
@@ -26,7 +32,7 @@ def train(cfg):
         num_heads=cfg.num_heads,
     )
     wandb.watch(model)
-    
+
     t = transforms.Compose(
         [
             transforms.Resize((cfg.image_size, cfg.image_size)),
@@ -36,28 +42,19 @@ def train(cfg):
     )
 
     train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
-    valid_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
+    validation_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
 
     train_data = data_utils.Subset(train_data, indices_train)
-    valid_data = data_utils.Subset(valid_data, indices_valid)
+    validation_data = data_utils.Subset(validation_data, indices_valid)
 
     train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
-    valid_loader = DataLoader(valid_data, batch_size=cfg.batch_size, shuffle=True)
+    validation_loader = DataLoader(validation_data, batch_size=cfg.batch_size, shuffle=True)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=cfg.lr)
-
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, cfg.num_epochs * len(train_loader)
-    )
-
-    model_checkpoint = ModelCheckpoint(
-        filepath="./outputs",
-        monitor="top5",
-    )
 
     print("Training started...")
     train_losses = []
@@ -111,8 +108,8 @@ def train(cfg):
             _, preds_indices = torch.max(preds, dim=1)
             validation_correct += (preds_indices == labels).sum()
 
-        train_accuracy = float(train_correct / (len(train_loader) * batch_size))
-        validation_accuracy = float(validation_correct / (len(validation_loader) * batch_size))
+        train_accuracy = float(train_correct / (len(train_loader) * cfg.batch_size))
+        validation_accuracy = float(validation_correct / (len(validation_loader) * cfg.batch_size))
 
         wandb.log({
             "train_loss": train_loss,
@@ -121,7 +118,6 @@ def train(cfg):
             "validation_accuracy": validation_accuracy,
         })
 
-        start_time = time()
         train_losses.append(train_loss / len(train_loader))
         validation_losses.append(validation_loss / len(validation_loader))
 
@@ -136,11 +132,11 @@ def train(cfg):
     plt.ylabel("loss")
     plt.legend()
 
-    fig_path = Path("reports/figures/training_run.png")
+    fig_path = "training_run.png"
     plt.savefig(fig_path)
     print(f"Saved training loss figure to {fig_path}")
 
-    model_path = Path("models/trained_model.pth")
+    model_path = "trained_model.pth"
     torch.save(model.state_dict(), model_path)
     print(f"Saved trained model to {model_path}")
 

@@ -56,4 +56,3 @@ class CNN(nn.Module):
         x = F.log_softmax(self.linear(x), dim=1)
 
         return x
-
