@@ -18,6 +18,7 @@ RUN dir
 
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc
+RUN mkdir data
 RUN dvc pull
 
 ENTRYPOINT ["python", "app/src/models/train_model.py"]
