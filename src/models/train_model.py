@@ -7,6 +7,7 @@ import torch
 import torch.utils.data as data_utils
 from model import ChessPiecePredictor
 from torch import nn, optim
+from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
@@ -41,6 +42,7 @@ def train(cfg):
 
     train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
     validation_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
+
 
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
@@ -137,6 +139,12 @@ def train(cfg):
     model_path = "trained_model.pth"
     torch.save(model.state_dict(), model_path)
     print(f"Saved trained model to {model_path}")
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket("chess_predictor")
+    blob = bucket.blob("model_blob")
+
+    blob.upload_from_filename("outputs/model_0.pt")
 
 
 if __name__ == "__main__":

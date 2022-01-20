@@ -3,3 +3,4 @@ steps:
   args: ['build', '-t', 'gcr.io/dtumlops-337917/images', '-f', 'trainer.dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/dtumlops-337917/images']
+timeout: 3600s

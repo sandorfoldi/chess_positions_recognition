@@ -87,6 +87,8 @@ outputs/
 # exclude data and local files from source control by default
 
 /data/
+/data23/
+
 reports/
 models/
 outputs/

@@ -99,14 +99,14 @@ def make_dataset(
 if __name__ == "__main__":
     make_dataset(
         input_dir="data/raw/train",
-        output_dir="data/processed/train",
+        output_dir="data23/processed/train",
         ind_start=0,
-        ind_stop=1000,
+        ind_stop=50,
     )
 
     make_dataset(
         input_dir="data/raw/test",
-        output_dir="data/processed/test",
+        output_dir="data23/processed/test",
         ind_start=0,
-        ind_stop=500,
+        ind_stop=10,
     )
