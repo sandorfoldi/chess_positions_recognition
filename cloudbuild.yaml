@@ -4,3 +4,4 @@ steps:
   timeout: 3600s
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/dtumlops-337917/images']
+  timeout: 3600s
