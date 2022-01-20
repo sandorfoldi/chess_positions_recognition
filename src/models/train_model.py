@@ -41,15 +41,14 @@ def train(cfg):
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
 
-
     train_data = data_utils.Subset(train_data, indices_train)
     valid_data = data_utils.Subset(valid_data, indices_valid)
+
     train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
     valid_loader = DataLoader(valid_data, batch_size=cfg.batch_size, shuffle=True)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=cfg.lr)
-
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, cfg.num_epochs * len(train_loader)
@@ -59,24 +58,12 @@ def train(cfg):
         filepath="./outputs",
         monitor="top5",
     )
-'''
-    trainer = ImageClassifierTrainer(
-        model,
-        train_loader,
-        valid_loader,
-        criterion,
-        optimizer,
-        scheduler,
-        cfg,
-        callbacks={"on_checkpoint": model_checkpoint},
-    )
-'''
 
     print("Training started...")
     train_losses = []
     validation_losses = []
 
-    batch_count = len(train_loader)#int(train_size / batch_size)
+    batch_count = len(train_loader)
     epochs = 2
     for e in range(epochs):
         train_loss = 0
@@ -156,10 +143,6 @@ def train(cfg):
     model_path = Path("models/trained_model.pth")
     torch.save(model.state_dict(), model_path)
     print(f"Saved trained model to {model_path}")
-    
-    '''
-    trainer.fit()
-    '''
 
 
 if __name__ == "__main__":
