@@ -8,19 +8,17 @@ RUN apt update && \
 
 WORKDIR /root
 
-RUN mkdir app
-
-COPY requirements.txt app/requirements.txt
-COPY .dvc app/.dvc
-COPY setup.py app/setup.py
-COPY src/ app/src/
-COPY data.dvc app/data.dvc
+COPY requirements.txt requirements.txt
+COPY .dvc .dvc
+COPY setup.py setup.py
+COPY src/ src/
+COPY data.dvc data.dvc
 
 RUN dir
 
 
 
-RUN pip install -r app/requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt --no-cache-dir
 # RUN pip install dvc
 # RUN dvc pull
 
