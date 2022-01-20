@@ -4,7 +4,7 @@ image_size: 50
 num_epochs: 5
 data_path: ${hydra:runtime.cwd}/data23/processed
 embed_dim: 128
-patch_size: 10
+patch_size: 12
 seed: 7
 in_channels: 1
 num_heads: 4

@@ -11,7 +11,6 @@ from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-from google.cloud import storage
 
 
 @hydra.main(config_path="../conf", config_name="config")
