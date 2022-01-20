@@ -41,12 +41,16 @@ def train(cfg):
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     torch.manual_seed(cfg.seed)
-
+    wandb.init()
+    '''
+    model = ChessPiecePredictor(cfg.image_size, cfg.patch_size, cfg.in_channels,
+                                cfg.embed_dim, cfg.num_heads)
+    '''
     model = CNN()
 
     t = transforms.Compose(
         [
-            transforms.Resize((cfg.image_size, cfg.image_size)),
+            #transforms.Resize((cfg.image_size, cfg.image_size)),
             transforms.Grayscale(num_output_channels=1),
             transforms.ToTensor(),
         ]
@@ -89,6 +93,9 @@ def train(cfg):
 
             optimizer.step()
             running_loss += loss.item()
+
+            top_p, top_class = out.topk(1, dim=1)
+            equals = top_class == labels.view(*top_class.shape)
             train_accuracy = torch.mean(equals.type(torch.FloatTensor))
             running_train_accuracy += train_accuracy.item()
 
@@ -97,9 +104,6 @@ def train(cfg):
                 wandb.log({
                     "Training Loss":loss.data.mean().item()
                 })
-            
-            
-
 
         else:
             with torch.no_grad():
@@ -158,6 +162,7 @@ def train(cfg):
 
     os.makedirs("figures/", exist_ok=True)
     plt.savefig("figures/train_loss.png")
+
 
 if __name__ == "__main__":
     train()

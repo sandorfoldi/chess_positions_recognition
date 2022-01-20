@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+NUM_CLASSES = 13
+
 
 class ChessPiecePredictor(nn.Module):
     def __init__(self, image_size, patch_size, in_channels, embed_dim, num_heads):
@@ -20,13 +22,14 @@ class ChessPiecePredictor(nn.Module):
             embed_dim=self.embed_dim,
             num_heads=self.num_heads,
         )
-        self.out = K.ClassificationHead(embed_size=self.embed_dim, num_classes=13)
+        self.out = K.ClassificationHead(embed_size=self.embed_dim, num_classes=NUM_CLASSES)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.inp(x)
         x = self.out(x)
 
         return x
+
 
 class CNN(nn.Module):
     def __init__(self):
@@ -43,8 +46,8 @@ class CNN(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(2),
         )
-         out channels x h x w (when flattening for linear)
-        self.linear = nn.Linear(32 * 12 * 12, 13)
+        # out channels x h x w (when flattening for linear)
+        self.linear = nn.Linear(32 * 12 * 12, NUM_CLASSES)
 
     def forward(self, x):
 
