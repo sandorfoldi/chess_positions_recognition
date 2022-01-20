@@ -6,9 +6,11 @@ from torchvision.datasets import ImageFolder
 from torchvision import transforms
 import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
+from src.models.model import ChessPiecePredictor
+import hydra
 
 
-def load_data():
+def load_data(data_path):
     t = transforms.Compose(
         [
             transforms.Grayscale(),
@@ -16,8 +18,8 @@ def load_data():
         ]
     )
 
-    train_data = ImageFolder("data/processed/train", transform=t)
-    valid_data = ImageFolder("data/processed/test", transform=t)
+    train_data = ImageFolder(f"{data_path}/train", transform=t)
+    valid_data = ImageFolder(f"{data_path}/test", transform=t)
 
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
@@ -30,13 +32,15 @@ def load_data():
     return train_loader, valid_loader
 
 
-def main():
-    train_loader, valid_loader = load_data()
+@hydra.main(config_path="../conf", config_name="config")
+def main(cfg):
+    train_loader, valid_loader = load_data(cfg.data_path)
 
     drift_detector = torchdrift.detectors.KernelMMDDriftDetector()
 
-    model = torch.load("./outputs/2022-01-19/11-45-12/outputs/model_2.pt")
-
+    model = ChessPiecePredictor(cfg.image_size, cfg.patch_size, cfg.in_channels,
+                                cfg.embed_dim, cfg.num_heads)
+    model.load_state_dict(torch.load("../../../models/trained_model.pth"))
     model.eval()
 
     drift_detection_model = torch.nn.Sequential(
@@ -44,7 +48,9 @@ def main():
         drift_detector
     )
 
-    predictions = model(data)
+    images, labels = next(iter(train_loader))
+    p
+    predictions = model(images[0][0])
 
     print(predictions)
 
