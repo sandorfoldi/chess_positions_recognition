@@ -12,13 +12,13 @@ COPY requirements.txt requirements.txt
 COPY .dvc .dvc
 COPY setup.py setup.py
 COPY src/ src/
-COPY data.dvc data.dvc
+COPY data2.dvc data2.dvc
 
 RUN dir
 
 RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install dvc[gs]
-RUN mkdir data
-RUN dvc pull data/processed/
+RUN mkdir data2
+RUN dvc pull data2
 
-ENTRYPOINT ["python", "app/src/models/train_model.py"]
+ENTRYPOINT ["python", "src/models/train_model.py"]
