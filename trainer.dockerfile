@@ -15,6 +15,6 @@ RUN pip install -r requirements.txt --no-cache-dir
 RUN pip install gsutil
 
 RUN mkdir data
-RUN gsutil -m cp -r gs://chess_predictor_data_small/processed data/
+RUN gsutil -m cp -r gs://chess_predictor_data/processed data/
 
 ENTRYPOINT ["python", "src/models/train_model.py"]
