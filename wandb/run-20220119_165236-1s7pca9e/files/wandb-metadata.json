@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.19043-SP0",
+    "python": "3.9.7",
+    "heartbeatAt": "2022-01-19T15:52:38.318133",
+    "startedAt": "2022-01-19T15:52:36.445350",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [
+        ".\\data\\processed\\train\\"
+    ],
+    "state": "running",
+    "program": "C:\\Users\\Mads_\\Desktop\\chess_positions_recognition\\src\\models\\train_model.py",
+    "codePath": "src\\models\\train_model.py",
+    "git": {
+        "remote": "https://github.com/sandorfoldi/chess_positions_recognition.git",
+        "commit": "84616d195ac313f953013273c0b98485507ed36c"
+    },
+    "email": "mads_langhorn@hotmail.com",
+    "root": "C:/Users/Mads_/Desktop/chess_positions_recognition",
+    "host": "LAPTOP-UBBQP4AV",
+    "username": "Mads_",
+    "executable": "C:\\Users\\Mads_\\anaconda3\\envs\\test_env\\python.exe"
+}

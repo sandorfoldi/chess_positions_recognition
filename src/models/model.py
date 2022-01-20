@@ -28,7 +28,6 @@ class ChessPiecePredictor(nn.Module):
 
         return x
 
-
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -44,7 +43,7 @@ class CNN(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(2),
         )
-        # out channels x h x w (when flattening for linear)
+         out channels x h x w (when flattening for linear)
         self.linear = nn.Linear(32 * 12 * 12, 13)
 
     def forward(self, x):
@@ -56,3 +55,4 @@ class CNN(nn.Module):
         x = F.log_softmax(self.linear(x), dim=1)
 
         return x
+    
