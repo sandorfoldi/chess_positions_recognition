@@ -1,7 +1,7 @@
 import random
 
 import matplotlib.pyplot as plt
-import wandb
+# import wandb
 import hydra
 import torch
 import torch.utils.data as data_utils
@@ -11,6 +11,7 @@ from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
+from google.cloud import storage
 
 
 @hydra.main(config_path="../conf", config_name="config")
@@ -19,7 +20,7 @@ def train(cfg):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    wandb.init()
+    # wandb.init()
 
     torch.manual_seed(cfg.seed)
 
@@ -30,7 +31,7 @@ def train(cfg):
         embed_dim=cfg.embed_dim,
         num_heads=cfg.num_heads,
     )
-    wandb.watch(model)
+    # wandb.watch(model)
 
     t = transforms.Compose(
         [
@@ -43,12 +44,11 @@ def train(cfg):
     train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
     validation_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
+    # indices_train = random.sample(range(1, 60000), 5000)
+    # indices_valid = random.sample(range(1, 30000), 1000)
 
-    indices_train = random.sample(range(1, 60000), 5000)
-    indices_valid = random.sample(range(1, 30000), 1000)
-
-    train_data = data_utils.Subset(train_data, indices_train)
-    validation_data = data_utils.Subset(validation_data, indices_valid)
+    # train_data = data_utils.Subset(train_data, indices_train)
+    # validation_data = data_utils.Subset(validation_data, indices_valid)
 
     train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
     validation_loader = DataLoader(validation_data, batch_size=cfg.batch_size, shuffle=True)
@@ -61,7 +61,7 @@ def train(cfg):
     validation_losses = []
 
     batch_count = len(train_loader)
-    epochs = 2
+    epochs = cfg.num_epochs
     for e in range(epochs):
         train_loss = 0
         train_correct = 0
@@ -111,12 +111,12 @@ def train(cfg):
         train_accuracy = float(train_correct / (len(train_loader) * cfg.batch_size))
         validation_accuracy = float(validation_correct / (len(validation_loader) * cfg.batch_size))
 
-        wandb.log({
-            "train_loss": train_loss,
-            "validation_loss": validation_loss,
-            "train_accuracy": train_accuracy,
-            "validation_accuracy": validation_accuracy,
-        })
+        # wandb.log({
+        #     "train_loss": train_loss,
+        #     "validation_loss": validation_loss,
+        #     "train_accuracy": train_accuracy,
+        #     "validation_accuracy": validation_accuracy,
+        # })
 
         train_losses.append(train_loss / len(train_loader))
         validation_losses.append(validation_loss / len(validation_loader))
@@ -143,9 +143,10 @@ def train(cfg):
     storage_client = storage.Client()
     bucket = storage_client.bucket("chess_predictor")
     blob = bucket.blob("model_blob")
-
-    blob.upload_from_filename("outputs/model_0.pt")
-
+    
+    blob.upload_from_filename(model_path)
+    
+    blob.make_public()
 
 if __name__ == "__main__":
     train()
