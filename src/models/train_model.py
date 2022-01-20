@@ -1,95 +1,76 @@
-import argparse
-import math
-import sys
-from pathlib import Path
-from time import time
+
+import hydra
+import torch
+from model import ChessPiecePredictor
+from torch import nn, optim
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
+import torch.utils.data as data_utils
+from torch.utils.data import DataLoader
+from kornia.x import ImageClassifierTrainer, ModelCheckpoint
 import random
 
-import matplotlib.pyplot as plt
-import torch
-import torchvision
-from model import ChessPiecePredictor, CNN
-from torch import nn
-from torch.utils.data import DataLoader
-import torch.utils.data as data_utils
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
-import wandb
 
+@hydra.main(config_path="../conf", config_name="config")
+def train(cfg):
 
-def train():
-    parser = argparse.ArgumentParser(description="Training arguments")
-    #parser.add_argument("load_data_from", default="")
-    # used for loading and training a model
-    parser.add_argument("--continue_training_from", required=False, type=Path)
-    args = parser.parse_args(sys.argv[1:])
+    print(f"Training started with parameters: {cfg}")
 
-    start_time = time()
-    wandb.init()
+    torch.manual_seed(cfg.seed)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device:", device)
-
-    print("Loading data...")
+    model = ChessPiecePredictor(
+        image_size=cfg.image_size,
+        patch_size=cfg.patch_size,
+        in_channels=cfg.in_channels,
+        embed_dim=cfg.embed_dim,
+        num_heads=cfg.num_heads,
+    )
+    wandb.watch(model)
+    
     t = transforms.Compose(
         [
+            transforms.Resize((cfg.image_size, cfg.image_size)),
+            transforms.Grayscale(num_output_channels=cfg.in_channels),
             transforms.ToTensor(),
-            transforms.Grayscale(),
         ]
     )
-    '''
-    data_set = torchvision.datasets.ImageFolder(args.load_data_from, transform=t)
-    train_size = math.ceil(len(data_set) * 0.85)
-    validation_size = math.floor(len(data_set) * 0.15)
 
-    train_data, validation_data = torch.utils.data.random_split(
-        data_set, [train_size, validation_size]
-    )
-    '''
-
-    train_data = ImageFolder("data/processed/train", transform=t)
-    validation_data = ImageFolder("data/processed/test", transform=t)
+    train_data = ImageFolder(f"{cfg.data_path}/train", transform=t)
+    valid_data = ImageFolder(f"{cfg.data_path}/test", transform=t)
 
     indices_train = random.sample(range(1, 60000), 5000)
     indices_valid = random.sample(range(1, 30000), 1000)
 
+
     train_data = data_utils.Subset(train_data, indices_train)
-    validation_data = data_utils.Subset(validation_data, indices_valid)
+    valid_data = data_utils.Subset(valid_data, indices_valid)
+    train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
+    valid_loader = DataLoader(valid_data, batch_size=cfg.batch_size, shuffle=True)
 
-    batch_size = 4
-    train_loader = DataLoader(
-        train_data, batch_size=batch_size, pin_memory=True, num_workers=4, shuffle=True
-    )
-    validation_loader = DataLoader(
-        validation_data,
-        batch_size=batch_size,
-        pin_memory=True,
-        num_workers=4,
-        shuffle=False,
-    )
-
-    #model = ChessPiecePredictor()
-    model = CNN()
-    # TODO what does this do?
-    wandb.watch(model)
-
-    if args.continue_training_from:
-        print(f"Loading model from {args.continue_training_from} ...")
-        checkpoint = torch.load(args.continue_training_from)
-        model.load_state_dict(checkpoint)
-
-    model.to(device)
     criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=cfg.lr)
 
-    learning_rate = 1e-4
-    momentum = 0.9
-    weight_decay = 0.0000001
-    optimizer = torch.optim.SGD(
-        model.parameters(),
-        lr=learning_rate,
-        momentum=momentum,
-        weight_decay=weight_decay,
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, cfg.num_epochs * len(train_loader)
     )
+
+    model_checkpoint = ModelCheckpoint(
+        filepath="./outputs",
+        monitor="top5",
+    )
+'''
+    trainer = ImageClassifierTrainer(
+        model,
+        train_loader,
+        valid_loader,
+        criterion,
+        optimizer,
+        scheduler,
+        cfg,
+        callbacks={"on_checkpoint": model_checkpoint},
+    )
+'''
 
     print("Training started...")
     train_losses = []
@@ -175,6 +156,10 @@ def train():
     model_path = Path("models/trained_model.pth")
     torch.save(model.state_dict(), model_path)
     print(f"Saved trained model to {model_path}")
+    
+    '''
+    trainer.fit()
+    '''
 
 
 if __name__ == "__main__":

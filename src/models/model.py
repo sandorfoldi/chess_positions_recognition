@@ -5,10 +5,22 @@ import torch.nn.functional as F
 
 
 class ChessPiecePredictor(nn.Module):
-    def __init__(self):
+    def __init__(self, image_size, patch_size, in_channels, embed_dim, num_heads):
         super().__init__()
-        self.inp = K.VisionTransformer(image_size=50, patch_size=5, in_channels=1)
-        self.out = K.ClassificationHead(num_classes=13)
+        self.image_size = image_size
+        self.patch_size = patch_size
+        self.in_channels = in_channels
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+
+        self.inp = K.VisionTransformer(
+            image_size=self.image_size,
+            patch_size=self.patch_size,
+            in_channels=self.in_channels,
+            embed_dim=self.embed_dim,
+            num_heads=self.num_heads,
+        )
+        self.out = K.ClassificationHead(embed_size=self.embed_dim, num_classes=13)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.inp(x)
@@ -44,3 +56,4 @@ class CNN(nn.Module):
         x = F.log_softmax(self.linear(x), dim=1)
 
         return x
+

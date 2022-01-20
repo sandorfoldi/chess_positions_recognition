@@ -43,6 +43,9 @@ nosetests.xml
 coverage.xml
 *.cover
 
+
+.dvc/cache
+
 # Translations
 *.mo
 *.pot
@@ -53,8 +56,14 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Hydra outputs
+outputs
+
 # PyBuilder
 target/
+
+# output files from hydra
+outputs/
 
 # DotEnv configuration
 .env
@@ -76,11 +85,16 @@ target/
 .ipynb_checkpoints/
 
 # exclude data and local files from source control by default
+
 /data/
 reports/
 models/
 outputs/
 wandb/
+
+
+# still include dvc files from the data directory
+!data/**/*.dvc
 
 # Mac OS-specific storage files
 .DS_Store
@@ -91,3 +105,4 @@ wandb/
 
 # Mypy cache
 .mypy_cache/
+/data

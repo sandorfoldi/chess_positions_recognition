@@ -4,7 +4,6 @@ from typing import List
 
 import numpy as np
 import torch
-from model import ChessPiecePredictor
 from PIL import Image
 from torchvision import transforms
 
@@ -15,7 +14,7 @@ def crop(image: np.ndarray) -> List[np.ndarray]:
     parts = []
     for r in range(0, image.shape[0], 50):
         for c in range(0, image.shape[1], 50):
-            parts.append(image[r: r + 50, c: c + 50])
+            parts.append(image[r : r + 50, c : c + 50])
     return parts
 
 
@@ -39,7 +38,7 @@ def board_to_fen(board):
 
         fen += "-"
 
-    return fen[:-1]  # do [:-1] to remove last "/"
+    return fen[:-1]  # do [:-1] to remove last "-"
 
 
 def predict():
@@ -53,9 +52,7 @@ def predict():
     args = parser.parse_args(sys.argv[1:])
 
     # model loading
-    model = ChessPiecePredictor()
-    state_dict = torch.load(args.load_model_from)
-    model.load_state_dict(state_dict)
+    model = torch.load(args.load_model_from)
     model.eval()
 
     # data loading and preparing
@@ -68,8 +65,12 @@ def predict():
     )  # convert to np.array() for speed. If not, we get a user warning
     squares = transforms.ConvertImageDtype(torch.float)(squares)
 
-    # convert from (64, 50, 50), models expects the extra dimension
-    squares = squares.view(64, 1, 50, 50)
+    # convert from (64, image_size, image_size), models expects the extra dimension
+    if model.image_size:
+        squares = transforms.Resize((model.image_size, model.image_size))(squares)
+        squares = squares.view(64, 1, model.image_size, model.image_size)
+    else:
+        squares = squares.view(64, 1, 50, 50)
 
     with torch.no_grad():
         prediction = model(squares)
