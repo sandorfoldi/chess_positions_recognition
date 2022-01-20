@@ -9,7 +9,7 @@ RUN apt update && \
 WORKDIR /root
 
 COPY requirements.txt requirements.txt
-COPY .dvc .dvc
+COPY .dvc/ .dvc/
 COPY setup.py setup.py
 COPY src/ src/
 COPY data.dvc data.dvc
