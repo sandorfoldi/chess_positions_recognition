@@ -87,7 +87,7 @@ outputs/
 # exclude data from source control by default
 /data/
 # still include dvc files from the data directory
-!data/**/*.dvc
+# !data/**/*.dvc
 # Mac OS-specific storage files
 .DS_Store
 
