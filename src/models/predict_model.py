@@ -86,7 +86,12 @@ def predict():
     """Given a model and an image of an entire chess board (found in data/raw/ folder),
     this method predicts what piece (if any) is on each square"""
 
-    wandb.init(project="chess-position", entity="mdjska")
+    # This is secret and shouldn't be checked into version control
+    os.environ["WANDB_API_KEY"] = "50f569476fd1824505d9afdd6374b1cafa309ce1"
+    # Name and notes optional
+    WANDB_ENTITY = "mdjska"
+    WANDB_PROJECT = "chess-position"
+    wandb.init(project=WANDB_PROJECT, entity=WANDB_ENTITY)
 
     # parsing
     print("Predicting squares...")
