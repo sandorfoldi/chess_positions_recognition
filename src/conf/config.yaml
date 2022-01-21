@@ -1,6 +1,6 @@
 lr: 0.001
 batch_size: 20
-image_size: 25
+image_size: 50
 num_epochs: 5
 data_path: ${hydra:runtime.cwd}/data/processed
 embed_dim: 128

@@ -26,8 +26,8 @@ def load_data(data_path):
 
     train_data = data_utils.Subset(train_data, indices_train)
     valid_data = data_utils.Subset(valid_data, indices_valid)
-    train_loader = DataLoader(train_data, batch_size=8, shuffle=True)
-    valid_loader = DataLoader(valid_data, batch_size=8, shuffle=True)
+    train_loader = DataLoader(train_data, batch_size=20, shuffle=True)
+    valid_loader = DataLoader(valid_data, batch_size=20, shuffle=True)
 
     return train_loader, valid_loader
 
@@ -49,8 +49,8 @@ def main(cfg):
     )
 
     images, labels = next(iter(train_loader))
-    p
-    predictions = model(images[0][0])
+    print(images[0].shape)
+    predictions = model.forward(images[0])
 
     print(predictions)
 
