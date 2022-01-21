@@ -1,5 +1,6 @@
 import hydra
 import torch
+import wandb
 from model import ChessPiecePredictor
 from torch import nn, optim
 from torchvision.datasets import ImageFolder
@@ -8,10 +9,19 @@ import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 from kornia.x import ImageClassifierTrainer, ModelCheckpoint
 import random
+from model_checkpoint import MyModelCheckpoint
+import os
 
 
 @hydra.main(config_path="../conf", config_name="config")
 def train(cfg):
+
+    # This is secret and shouldn't be checked into version control
+    os.environ["WANDB_API_KEY"] = "50f569476fd1824505d9afdd6374b1cafa309ce1"
+    # Name and notes optional
+    WANDB_ENTITY = "mdjska"
+    WANDB_PROJECT = "chess-position"
+    wandb.init(project=WANDB_PROJECT, entity=WANDB_ENTITY)
 
     print(f"Training started with parameters: {cfg}")
 
@@ -51,10 +61,10 @@ def train(cfg):
         optimizer, cfg.num_epochs * len(train_loader)
     )
 
-    model_checkpoint = ModelCheckpoint(
-        filepath="./outputs",
-        monitor="top5",
-    )
+    model_checkpoint = MyModelCheckpoint(filepath="./outputs", monitor="top5",)
+
+    # log model gradients
+    wandb.watch(model, log_freq=100)
 
     trainer = ImageClassifierTrainer(
         model,
@@ -72,3 +82,4 @@ def train(cfg):
 
 if __name__ == "__main__":
     train()
+
