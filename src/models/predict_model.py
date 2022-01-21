@@ -2,6 +2,8 @@ import argparse
 import sys
 from typing import List
 
+from model import ChessPiecePredictor
+
 import numpy as np
 import torch
 from PIL import Image
@@ -52,7 +54,8 @@ def predict():
     args = parser.parse_args(sys.argv[1:])
 
     # model loading
-    model = torch.load(args.load_model_from)
+    model = ChessPiecePredictor(25, 12, 1, 128, 4)
+    model.load_state_dict(torch.load(args.load_model_from))
     model.eval()
 
     # data loading and preparing
